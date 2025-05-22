@@ -14,6 +14,15 @@ import torch
 import torch.optim as optim 
 import torch.nn as nn
 
+# Import metrics libraries
+import torchmetrics
+from torchmetrics import Accuracy
+from torchmetrics import ConfusionMatrix
+import mlxtend
+from mlxtend.plotting import plot_confusion_matrix
+from mlxtend.evaluate import confusion_matrix
+from torch.utils.tensorboard import SummaryWriter  # Import TensorBoard
+
 
 # In[17]:
 
