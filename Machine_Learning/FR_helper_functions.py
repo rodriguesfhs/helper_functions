@@ -20,7 +20,7 @@ import mlxtend
 from mlxtend.plotting import plot_confusion_matrix
 from mlxtend.evaluate import confusion_matrix
 from torch.utils.tensorboard import SummaryWriter  # Import TensorBoard
-from tqdm import tqdm
+import tqdm
 
 
 # In[17]:
