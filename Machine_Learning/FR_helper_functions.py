@@ -16,8 +16,6 @@ import torch.nn as nn
 
 # Import metrics libraries
 import torchmetrics
-from torchmetrics import Accuracy, Precision, Recall, F1Score
-from torchmetrics import ConfusionMatrix
 import mlxtend
 from mlxtend.plotting import plot_confusion_matrix
 from mlxtend.evaluate import confusion_matrix
