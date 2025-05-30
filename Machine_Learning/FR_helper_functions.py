@@ -203,7 +203,7 @@ def train(model: torch.nn.Module,
 
     # --- Final Confusion Matrix ---
     class_names = sorted(list(set(all_test_labels)))
-    cm = confusion_matrix(y_true=all_test_labels, y_pred=all_test_preds)
+    cm = confusion_matrix(all_test_labels, all_test_preds)
     plot_confusion_matrix(conf_mat=cm,
                           class_names=class_names,
                           figsize=(4, 4),
