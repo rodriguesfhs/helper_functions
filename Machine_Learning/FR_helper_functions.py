@@ -209,7 +209,7 @@ def train(model: torch.nn.Module,
                           figsize=(4, 4),
                           show_normed=True,
                           colorbar=True,
-                          cmap='cividis')
+                          cmap='Blues')
     plt.title(f"{model_name} - Confusion Matrix")
     plt.tight_layout()
     plt.show()    
