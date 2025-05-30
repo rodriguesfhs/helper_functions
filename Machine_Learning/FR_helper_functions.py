@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[15]:
+# In[1]:
 
 
 # Import essential libraries
@@ -16,14 +16,17 @@ import torch.nn as nn
 
 # Import metrics libraries
 import torchmetrics
+from torchmetrics import Accuracy
+from torchmetrics import ConfusionMatrix
 import mlxtend
 from mlxtend.plotting import plot_confusion_matrix
 from mlxtend.evaluate import confusion_matrix
 from torch.utils.tensorboard import SummaryWriter  # Import TensorBoard
-import tqdm
+
+from tqdm import tqdm
 
 
-# In[17]:
+# In[3]:
 
 
 # Trainer function for PyTorch
@@ -33,6 +36,7 @@ def train(model: torch.nn.Module,
            train_loader,
            test_loader,
            optimizer_class: type[optim.Optimizer] = optim.Adam,
+           label_smoothing: float = 0.0,
            epochs: int = 20, 
            lr: float = 1e-3, 
            weight_decay=1e-4,
@@ -60,7 +64,7 @@ def train(model: torch.nn.Module,
     optimizer = optimizer_class(params=model.parameters(),
                                 lr=lr,
                                 weight_decay=weight_decay)
-    loss_fn = nn.CrossEntropyLoss(label_smoothing=0.1)
+    loss_fn = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
 
     # Store metrics
     train_losses = []
@@ -205,7 +209,7 @@ def train(model: torch.nn.Module,
                           figsize=(4, 4),
                           show_normed=True,
                           colorbar=True,
-                          cmap='Blues')
+                          cmap='cividis')
     plt.title(f"{model_name} - Confusion Matrix")
     plt.tight_layout()
     plt.show()    
