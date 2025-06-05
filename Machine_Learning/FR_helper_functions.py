@@ -400,17 +400,17 @@ def multi_plotter(data_dict: dict,
         plt.xlabel("Step (Epoch)")
         plt.ylabel("Loss")
 
-        # Train/Test Loss
-        plt.subplot(3, 2, 3)
-        sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', color=color, alpha=ALPHA)
-        smoothed_train = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['train_loss']['Step'], y=smoothed_train, label=f"Train {model_name}", color=color)
-        sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', color=color, alpha=ALPHA)
-        smoothed_test = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['test_loss']['Step'], y=smoothed_test, label=f"Test {model_name}", color=color)
-        plt.title("Train/Test loss")
-        plt.xlabel("Step (Epoch)")
-        plt.ylabel("Loss")
+        # # Train/Test Loss
+        # plt.subplot(3, 2, 3)
+        # sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', color=color, alpha=ALPHA)
+        # smoothed_train = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        # sns.lineplot(x=model_data['train_loss']['Step'], y=smoothed_train, label=f"Train {model_name}", color=color)
+        # sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', color=color, alpha=ALPHA)
+        # smoothed_test = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        # sns.lineplot(x=model_data['test_loss']['Step'], y=smoothed_test, label=f"Test {model_name}", color=color)
+        # plt.title("Train/Test loss")
+        # plt.xlabel("Step (Epoch)")
+        # plt.ylabel("Loss")
 
         # Train Accuracy
         plt.subplot(3, 2, 4)
@@ -430,17 +430,17 @@ def multi_plotter(data_dict: dict,
         plt.xlabel("Step (Epoch)")
         plt.ylabel("Accuracy")
 
-        # Train/Test Accuracy
-        plt.subplot(3, 2, 6)
-        sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', color=color, alpha=ALPHA)
-        smoothed_train = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['train_acc']['Step'], y=smoothed_train, label=f"Train {model_name}", color=color)
-        sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', color=color, alpha=ALPHA)
-        smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['test_acc']['Step'], y=smoothed_test, label=f"Test {model_name}", color=color)
-        plt.title("Train/Test accuracy")
-        plt.xlabel("Step (Epoch)")
-        plt.ylabel("Accuracy")
+        # # Train/Test Accuracy
+        # plt.subplot(3, 2, 6)
+        # sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', color=color, alpha=ALPHA)
+        # smoothed_train = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        # sns.lineplot(x=model_data['train_acc']['Step'], y=smoothed_train, label=f"Train {model_name}", color=color)
+        # sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', color=color, alpha=ALPHA)
+        # smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        # sns.lineplot(x=model_data['test_acc']['Step'], y=smoothed_test, label=f"Test {model_name}", color=color)
+        # plt.title("Train/Test accuracy")
+        # plt.xlabel("Step (Epoch)")
+        # plt.ylabel("Accuracy")
 
     plt.tight_layout()
     plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
