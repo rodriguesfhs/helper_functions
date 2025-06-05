@@ -204,15 +204,21 @@ def train(model: torch.nn.Module,
     # --- Final Confusion Matrix ---
     class_names = sorted(list(set(all_test_labels)))
     cm = confusion_matrix(all_test_labels, all_test_preds)
+    
+    fig_cm = plt.figure(figsize=(4, 4))
     plot_confusion_matrix(conf_mat=cm,
                           class_names=class_names,
-                          figsize=(4, 4),
                           show_normed=True,
                           colorbar=True,
                           cmap='Blues')
     plt.title(f"{model_name} - Confusion Matrix")
     plt.tight_layout()
-    plt.show()    
+    
+    # ➕ Log to TensorBoard
+    writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
+    
+    plt.show()
+
 
     writer.close()
     print(f"TensorBoard logs saved to: runs/{MODEL_NAME}")
@@ -409,6 +415,162 @@ def multi_plotter(data_dict: dict,
         ALPHA=0.2
         # SMOOTHING=0.1
         # Train Loss
+        plt.subplot(3, 2, 1)
+        sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA)
+        sns.lineplot(data=model_data['train_loss'], x='Step', y=model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color)
+        plt.title("Train loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+
+        # Test Loss
+        plt.subplot(3, 2, 2)
+        sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA)
+        sns.lineplot(data=model_data['test_loss'], x='Step', y=model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color)
+        plt.title("Test loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+
+        # Train/Test Loss
+        plt.subplot(3, 2, 3)
+        sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA,
+                     label='Train')
+        sns.lineplot(data=model_data['train_loss'], x='Step', y=model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color,
+                     label='Train')
+        sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA,
+                     label='Test')
+        sns.lineplot(data=model_data['test_loss'], x='Step', y=model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color,
+                     label='Test')
+        plt.title("Train/Test loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+       
+
+        # Train Accuracy
+        plt.subplot(3, 2, 4)
+        sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA)
+        sns.lineplot(data=model_data['train_acc'], x='Step', y=model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color)
+        plt.title("Train accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+
+        # Test Accuracy
+        plt.subplot(3, 2, 5)
+        sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA)
+        sns.lineplot(data=model_data['test_acc'], x='Step', y=model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color)
+        plt.title("Test accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+
+        # Train/Test Accuracy
+        plt.subplot(3, 2, 6)
+        sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA,
+                     label='Train')
+        sns.lineplot(data=model_data['train_acc'], x='Step', y=model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color,
+                     label='Train')
+        sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', 
+                     color=color,
+                     alpha=ALPHA,
+                     label='Test')
+        sns.lineplot(data=model_data['test_acc'], x='Step', y=model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, 
+                                                                                                      adjust=False).mean(), 
+                     label=model_name, 
+                     color=color,
+                     label='Test')
+        plt.title("Train/Test accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+
+    plt.tight_layout()
+    plt.legend(loc='best',
+               ncols=ncols,
+              fontsize=10)
+    plt.show()
+
+
+# In[ ]:
+
+
+def multi_plotter2(data_dict: dict,
+                  ncols:int = 1,
+                  fontsize:int =10,
+                  SMOOTHING: float=0.1):
+    """
+    Generates a 2x2 figure with subplots for train loss, test loss,
+    train accuracy, and test accuracy for multiple models, with colors
+    specified inline within the data dictionary.
+
+    Args:
+        data_dict (dict): A dictionary where keys are model names (str)
+                           and values are dictionaries containing the DataFrames
+                           for 'train_loss', 'test_loss', 'train_acc', 'test_acc',
+                           and the color associated with the model name (e.g., 'Model 16': '#D33B90').
+                           Each of the DataFrames MUST have 'Step' and 'Value' columns.
+        SMOOTHING (float): Pandas ewm (Exponentially Weighted Moving) smoothing. The higher the value, the lower
+                            the smoothing is. It adjusts ewm alpha parameter.
+                           Example:
+                           {
+                               'Model 16': {'train_loss': df16_train_loss, 
+                                            'test_loss': df16_test_loss, 
+                                            'train_acc': df16_train_acc, 
+                                            'test_acc': df16_test_acc, 
+                                            'color': '#D33B90'},
+                                            
+                               'Model 17': {'train_loss': df17_train_loss, 
+                                            'test_loss': df17_test_loss, 
+                                            'train_acc': df17_train_acc, 
+                                            'test_acc': df17_test_acc, 
+                                            'color': '#EDAF3D'},
+                                            
+                               'Model 18': {'train_loss': df18_train_loss, 
+                                            'test_loss': df18_test_loss, 
+                                            'train_acc': df18_train_acc, 
+                                            'test_acc': df18_test_acc, 
+                                            'color': '#883ADE'}
+                           }
+    """
+    plt.figure(figsize=(14, 9), dpi=100)
+
+    for model_name, model_data in data_dict.items():
+        color = model_data.get('color')
+        
+        ALPHA=0.2
+        # SMOOTHING=0.1
+        # Train Loss
         plt.subplot(2, 2, 1)
         sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', 
                      color=color,
@@ -470,7 +632,7 @@ def multi_plotter(data_dict: dict,
 # In[35]:
 
 
-def multi_plotter2(data_dict: dict,
+def multi_plotter3(data_dict: dict,
                    ncols:int = 3,
                    fontsize:int =8,
                    SMOOTHING: float = 0.1):
