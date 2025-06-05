@@ -136,10 +136,10 @@ def train(model: torch.nn.Module,
                 all_test_labels.extend(y_batch.cpu().numpy())
 
                 # Update metrics
-                metric_accuracy.update(y_batch, pred_labels)
-                metric_precision.update(y_batch, pred_labels)
-                metric_recall.update(y_batch, pred_labels)
-                metric_f1.update(y_batch, pred_labels)
+                metric_accuracy.update(pred_labels, y_batch)
+                metric_precision.update(pred_labels, y_batch)
+                metric_recall.update(pred_labels, y_batch)
+                metric_f1.update(pred_labels, y_batch)
 
 
         avg_test_loss = test_loss / len(test_loader.dataset)
