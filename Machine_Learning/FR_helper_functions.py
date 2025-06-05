@@ -444,22 +444,18 @@ def multi_plotter(data_dict: dict,
         plt.subplot(3, 2, 3)
         sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', 
                      color=color,
-                     alpha=ALPHA,
-                     label='Train')
+                     alpha=ALPHA)
         sns.lineplot(data=model_data['train_loss'], x='Step', y=model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, 
                                                                                                       adjust=False).mean(), 
-                     label=model_name, 
-                     color=color,
-                     label='Train')
+                     label=f"Train {model_name}", 
+                     color=color)
         sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', 
                      color=color,
-                     alpha=ALPHA,
-                     label='Test')
+                     alpha=ALPHA)
         sns.lineplot(data=model_data['test_loss'], x='Step', y=model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, 
                                                                                                       adjust=False).mean(), 
-                     label=model_name, 
-                     color=color,
-                     label='Test')
+                     label=f"Test {model_name}", 
+                     color=color)
         plt.title("Train/Test loss")
         plt.xlabel("Step (Epoch)")
         plt.ylabel("Loss")
@@ -495,22 +491,22 @@ def multi_plotter(data_dict: dict,
         plt.subplot(3, 2, 6)
         sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', 
                      color=color,
-                     alpha=ALPHA,
-                     label='Train')
+                     alpha=ALPHA
+                     )
         sns.lineplot(data=model_data['train_acc'], x='Step', y=model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, 
                                                                                                       adjust=False).mean(), 
-                     label=model_name, 
+                     label=f"Train {model_name}",
                      color=color,
-                     label='Train')
+                    ) 
         sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', 
                      color=color,
-                     alpha=ALPHA,
-                     label='Test')
+                     alpha=ALPHA
+                     )
         sns.lineplot(data=model_data['test_acc'], x='Step', y=model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, 
                                                                                                       adjust=False).mean(), 
-                     label=model_name, 
+                     label=f"Test {model_name}",
                      color=color,
-                     label='Test')
+                    ) 
         plt.title("Train/Test accuracy")
         plt.xlabel("Step (Epoch)")
         plt.ylabel("Accuracy")
