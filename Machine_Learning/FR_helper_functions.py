@@ -461,7 +461,12 @@ def multi_plotter(data_dict: dict,
         plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
 
     plt.tight_layout()
-    plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+    # After all plotting, before plt.show()
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
+
+    # plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
     plt.show()
 
 
