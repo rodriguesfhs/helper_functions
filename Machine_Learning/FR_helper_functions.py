@@ -441,6 +441,7 @@ def multi_plotter(data_dict: dict,
         plt.title("Train/Test loss")
         plt.xlabel("Step (Epoch)")
         plt.ylabel("Loss")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
 
         # # Train/Test Accuracy
         plt.subplot(3, 2, 6)
@@ -456,7 +457,8 @@ def multi_plotter(data_dict: dict,
                      color=color)
         plt.title("Train/Test accuracy")
         plt.xlabel("Step (Epoch)")
-        plt.ylabel("Accuracy")        
+        plt.ylabel("Accuracy")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
 
     plt.tight_layout()
     plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
