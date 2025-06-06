@@ -366,7 +366,136 @@ def load_metrics(model_num):
     }
 
 
-# In[32]:
+# In[ ]:
+
+
+def multi_plotter(data_dict: dict,
+                  ncols: int = 1,
+                  fontsize: int = 10,
+                  SMOOTHING: float = 0.1):
+    """
+    Plots train/test loss and accuracy for multiple models with smoothing.
+    """
+    plt.figure(figsize=(14, 9), dpi=100)
+
+    for model_name, model_data in data_dict.items():
+        color = model_data.get('color')
+        ALPHA = 0.2
+
+        # Train Loss
+        plt.subplot(3, 2, 1)
+        sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', color=color, alpha=ALPHA)
+        smoothed = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        sns.lineplot(x=model_data['train_loss']['Step'], y=smoothed, 
+                     label=model_name, 
+                     color=color)
+        plt.title("Train loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+
+        # Test Loss
+        plt.subplot(3, 2, 2)
+        sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', color=color, alpha=ALPHA)
+        smoothed = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        sns.lineplot(x=model_data['test_loss']['Step'], y=smoothed, 
+                     label=model_name, 
+                     color=color)
+        plt.title("Test loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+
+        # Train Accuracy
+        plt.subplot(3, 2, 3)
+        sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', color=color, alpha=ALPHA)
+        smoothed = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        sns.lineplot(x=model_data['train_acc']['Step'], y=smoothed, 
+                     label=model_name, 
+                     color=color)
+        plt.title("Train accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+
+        # Test Accuracy
+        plt.subplot(3, 2, 4)
+        sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', color=color, alpha=ALPHA)
+        smoothed = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        sns.lineplot(x=model_data['test_acc']['Step'], y=smoothed, 
+                     label=model_name, 
+                     color=color)
+        plt.title("Test accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+
+        # Train/Test Loss
+        plt.subplot(3, 2, 5)
+        
+        # Raw train (semi-transparent)
+        plt.plot(model_data['train_loss']['Step'],
+                 model_data['train_loss']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed train (with label)
+        smoothed_train = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['train_loss']['Step'],
+                 smoothed_train,
+                 label=f"Train {model_name}",
+                 color=color)
+        
+        # Raw test (semi-transparent)
+        plt.plot(model_data['test_loss']['Step'],
+                 model_data['test_loss']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed test (with label)
+        smoothed_test = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['test_loss']['Step'],
+                 smoothed_test,
+                 label=f"Test {model_name}",
+                 color=color)
+        
+        plt.title("Train/Test loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+
+        # # Train/Test Accuracy
+        # Train/Test Accuracy
+        plt.subplot(3, 2, 6)
+        
+        # Raw train accuracy (semi-transparent)
+        plt.plot(model_data['train_acc']['Step'],
+                 model_data['train_acc']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed train accuracy (with label)
+        smoothed_train = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['train_acc']['Step'],
+                 smoothed_train,
+                 label=f"Train {model_name}",
+                 color=color)
+        
+        # Raw test accuracy (semi-transparent)
+        plt.plot(model_data['test_acc']['Step'],
+                 model_data['test_acc']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed test accuracy (with label)
+        smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['test_acc']['Step'],
+                 smoothed_test,
+                 label=f"Test {model_name}",
+                 color=color)
+        
+        plt.title("Train/Test accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+
+        
+    plt.tight_layout()
+    plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+    plt.show()
+
+
+# In[ ]:
 
 
 # def multi_plotter(data_dict: dict,
@@ -457,130 +586,10 @@ def load_metrics(model_num):
 #         plt.title("Train/Test accuracy")
 #         plt.xlabel("Step (Epoch)")
 #         plt.ylabel("Accuracy")
-#         handles, labels = plt.gca().get_legend_handles_labels()
-#         by_label = dict(zip(labels, handles))
-
+#         
 #     plt.tight_layout()
 #     plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
 #     plt.show()
-
-
-# In[ ]:
-
-
-def multi_plotter(data_dict: dict,
-                  ncols: int = 1,
-                  fontsize: int = 10,
-                  SMOOTHING: float = 0.1):
-    """
-    Plots train/test loss and accuracy for multiple models with smoothing.
-    Shows a deduplicated legend per subplot.
-    """
-    plt.figure(figsize=(14, 9), dpi=100)
-    ALPHA = 0.2
-
-    # --------- 1. Train Loss ----------
-    plt.subplot(3, 2, 1)
-    for model_name, model_data in data_dict.items():
-        color = model_data.get('color')
-        # Raw line (no label)
-        sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        # Smoothed line (label)
-        smoothed = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['train_loss']['Step'], y=smoothed, label=model_name, color=color)
-    plt.title("Train loss")
-    plt.xlabel("Step (Epoch)")
-    plt.ylabel("Loss")
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
-
-    # --------- 2. Test Loss ----------
-    plt.subplot(3, 2, 2)
-    for model_name, model_data in data_dict.items():
-        color = model_data.get('color')
-        sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        smoothed = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['test_loss']['Step'], y=smoothed, label=model_name, color=color)
-    plt.title("Test loss")
-    plt.xlabel("Step (Epoch)")
-    plt.ylabel("Loss")
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
-
-    # --------- 3. Train Accuracy ----------
-    plt.subplot(3, 2, 3)
-    for model_name, model_data in data_dict.items():
-        color = model_data.get('color')
-        sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        smoothed = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['train_acc']['Step'], y=smoothed, label=model_name, color=color)
-    plt.title("Train accuracy")
-    plt.xlabel("Step (Epoch)")
-    plt.ylabel("Accuracy")
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
-
-    # --------- 4. Test Accuracy ----------
-    plt.subplot(3, 2, 4)
-    for model_name, model_data in data_dict.items():
-        color = model_data.get('color')
-        sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        smoothed = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['test_acc']['Step'], y=smoothed, label=model_name, color=color)
-    plt.title("Test accuracy")
-    plt.xlabel("Step (Epoch)")
-    plt.ylabel("Accuracy")
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
-
-    # --------- 5. Train/Test Loss (together) ----------
-    plt.subplot(3, 2, 5)
-    for model_name, model_data in data_dict.items():
-        color = model_data.get('color')
-        # Train raw
-        sns.lineplot(data=model_data['train_loss'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        # Train smoothed
-        smoothed_train = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['train_loss']['Step'], y=smoothed_train, label=f"Train {model_name}", color=color)
-        # Test raw
-        sns.lineplot(data=model_data['test_loss'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        # Test smoothed
-        smoothed_test = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['test_loss']['Step'], y=smoothed_test, label=f"Test {model_name}", color=color)
-    plt.title("Train/Test loss")
-    plt.xlabel("Step (Epoch)")
-    plt.ylabel("Loss")
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
-
-    # --------- 6. Train/Test Accuracy (together) ----------
-    plt.subplot(3, 2, 6)
-    for model_name, model_data in data_dict.items():
-        color = model_data.get('color')
-        # Train raw
-        sns.lineplot(data=model_data['train_acc'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        # Train smoothed
-        smoothed_train = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['train_acc']['Step'], y=smoothed_train, label=f"Train {model_name}", color=color)
-        # Test raw
-        sns.lineplot(data=model_data['test_acc'], x='Step', y='Value', color=color, alpha=ALPHA, label=None)
-        # Test smoothed
-        smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
-        sns.lineplot(x=model_data['test_acc']['Step'], y=smoothed_test, label=f"Test {model_name}", color=color)
-    plt.title("Train/Test accuracy")
-    plt.xlabel("Step (Epoch)")
-    plt.ylabel("Accuracy")
-    handles, labels = plt.gca().get_legend_handles_labels()
-    by_label = dict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc='best', ncols=ncols, fontsize=fontsize)
-
-    plt.tight_layout()
-    plt.show()
 
 
 # In[ ]:
