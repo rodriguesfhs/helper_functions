@@ -205,17 +205,23 @@ def train(model: torch.nn.Module,
     class_names = sorted(list(set(all_test_labels)))
     cm = confusion_matrix(all_test_labels, all_test_preds)
     
-    fig_cm = plt.figure(figsize=(4, 4))
-    plot_confusion_matrix(conf_mat=cm,
-                          class_names=class_names,
-                          show_normed=True,
-                          colorbar=True,
-                          cmap='Blues')
+    fig_cm, ax = plot_confusion_matrix(conf_mat=cm,
+                                   class_names=class_names,
+                                   show_normed=True,
+                                   colorbar=True,
+                                   cmap='Blues',
+                                   figsize=(4, 4))  # Pass figsize here
+
     plt.title(f"{model_name} - Confusion Matrix")
     plt.tight_layout()
     
-    # ➕ Log to TensorBoard
     writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
+    # print("Saving local copy of confusion matrix...")
+    # fig_cm.savefig("debug_conf_matrix.png")
+
+    plt.close(fig_cm)
+
+
     
     plt.show()
 
