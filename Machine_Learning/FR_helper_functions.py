@@ -488,7 +488,8 @@ def multi_plotter(data_dict: dict,
         plt.plot(model_data['test_loss']['Step'],
                  model_data['test_loss']['Value'],
                  color=color, alpha=ALPHA,
-                 label=None)
+                 label=None,
+                 ls='--')
         
         # Smoothed test (with label)
         smoothed_test = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
@@ -525,8 +526,8 @@ def multi_plotter(data_dict: dict,
         plt.plot(model_data['test_acc']['Step'],
                  model_data['test_acc']['Value'],
                  color=color, alpha=ALPHA,
-                 label=None
-                )
+                 label=None,
+                 ls='--')
         
         # Smoothed test accuracy (with label)
         smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
