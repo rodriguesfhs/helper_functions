@@ -475,9 +475,182 @@ def multi_plotter(data_dict: dict,
         smoothed_train = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
         plt.plot(model_data['train_loss']['Step'],
                  smoothed_train,
-                 # label=f"Train {model_name}",
-                 color=color,
+                 label=f"{model_name}",
+                 color=color)
+        
+        # Raw test (semi-transparent)
+        plt.plot(model_data['test_loss']['Step'],
+                 model_data['test_loss']['Value'],
+                 color=color, alpha=ALPHA,
                  label=None)
+        
+        # Smoothed test (with label)
+        smoothed_test = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['test_loss']['Step'],
+                 smoothed_test,
+                 # label=f"Test {model_name}",
+                 color=color,
+                 label=None,
+                 ls='--')
+        
+        plt.title("Train (solid) / Test (dashed) loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+    
+
+        # Train/Test Accuracy
+        plt.subplot(3, 2, 6)
+        
+        # Raw train accuracy (semi-transparent)
+        plt.plot(model_data['train_acc']['Step'],
+                 model_data['train_acc']['Value'],
+                 color=color, alpha=ALPHA,
+                 label=None)
+        
+        # Smoothed train accuracy (with label)
+        smoothed_train = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['train_acc']['Step'],
+                 smoothed_train,
+                 label=f"{model_name}",
+                 color=color)
+        
+        # Raw test accuracy (semi-transparent)
+        plt.plot(model_data['test_acc']['Step'],
+                 model_data['test_acc']['Value'],
+                 color=color, alpha=ALPHA,
+                 label=None
+                )
+        
+        # Smoothed test accuracy (with label)
+        smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['test_acc']['Step'],
+                 smoothed_test,
+                 # label=f"Test {model_name}",
+                 color=color,
+                 label=None,
+                 ls='--')
+        
+        plt.title("Train (solid) / Test (dashed) accuracy ")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+
+        plt.tight_layout()
+    plt.show()
+
+
+# In[ ]:
+
+
+def multi_plotter2(data_dict: dict,
+                  ncols: int = 1,
+                  fontsize: int = 10,
+                  SMOOTHING: float = 0.1):
+    """
+    Plots train/test loss and accuracy for multiple models with smoothing.
+    """
+    plt.figure(figsize=(14, 9), dpi=100)
+
+    for model_name, model_data in data_dict.items():
+        color = model_data.get('color')
+        ALPHA = 0.2
+
+        # Train Loss
+        plt.subplot(3, 2, 1)        
+        # Raw train loss (semi-transparent)
+        plt.plot(model_data['train_loss']['Step'],
+                 model_data['train_loss']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed train loss (with label)
+        smoothed = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['train_loss']['Step'],
+                 smoothed,
+                 label=model_name,
+                 color=color)
+        
+        plt.title("Train loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+
+
+        # Test Loss
+        plt.subplot(3, 2, 2)        
+        # Raw test loss (semi-transparent)
+        plt.plot(model_data['test_loss']['Step'],
+                 model_data['test_loss']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed test loss (with label)
+        smoothed = model_data['test_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['test_loss']['Step'],
+                 smoothed,
+                 label=model_name,
+                 color=color)
+        
+        plt.title("Test loss")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Loss")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+
+
+        # Train Accuracy
+        plt.subplot(3, 2, 3)        
+        # Raw train accuracy (semi-transparent)
+        plt.plot(model_data['train_acc']['Step'],
+                 model_data['train_acc']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed train accuracy (with label)
+        smoothed = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['train_acc']['Step'],
+                 smoothed,
+                 label=model_name,
+                 color=color)
+        
+        plt.title("Train accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+
+
+        # Test Accuracy
+        plt.subplot(3, 2, 4)        
+        # Raw test accuracy (semi-transparent)
+        plt.plot(model_data['test_acc']['Step'],
+                 model_data['test_acc']['Value'],
+                 color=color, alpha=ALPHA)
+        
+        # Smoothed test accuracy (with label)
+        smoothed = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['test_acc']['Step'],
+                 smoothed,
+                 label=model_name,
+                 color=color)
+        
+        plt.title("Test accuracy")
+        plt.xlabel("Step (Epoch)")
+        plt.ylabel("Accuracy")
+        plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
+
+
+        # Train/Test Loss
+        plt.subplot(3, 2, 5)
+        
+        # Raw train (semi-transparent)
+        plt.plot(model_data['train_loss']['Step'],
+                 model_data['train_loss']['Value'],
+                 color=color, alpha=ALPHA,
+                 label=None)
+        
+        # Smoothed train (with label)
+        smoothed_train = model_data['train_loss']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
+        plt.plot(model_data['train_loss']['Step'],
+                 smoothed_train,
+                 label=f"Train {model_name}",
+                 color=color)
         
         # Raw test (semi-transparent)
         plt.plot(model_data['test_loss']['Step'],
@@ -490,7 +663,8 @@ def multi_plotter(data_dict: dict,
         plt.plot(model_data['test_loss']['Step'],
                  smoothed_test,
                  label=f"Test {model_name}",
-                 color=color)
+                 color=color,
+                 ls='--')
         
         plt.title("Train/Test loss")
         plt.xlabel("Step (Epoch)")
@@ -511,36 +685,30 @@ def multi_plotter(data_dict: dict,
         smoothed_train = model_data['train_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
         plt.plot(model_data['train_acc']['Step'],
                  smoothed_train,
-                 # label=f"Train {model_name}",
-                 color=color,
-                 label=None)
+                 label=f"Train {model_name}",
+                 color=color)
         
         # Raw test accuracy (semi-transparent)
         plt.plot(model_data['test_acc']['Step'],
                  model_data['test_acc']['Value'],
                  color=color, alpha=ALPHA,
-                 label=None)
+                 label=None
+                )
         
         # Smoothed test accuracy (with label)
         smoothed_test = model_data['test_acc']['Value'].ewm(alpha=SMOOTHING, adjust=False).mean()
         plt.plot(model_data['test_acc']['Step'],
                  smoothed_test,
                  label=f"Test {model_name}",
-                 color=color)
+                 color=color,
+                 ls='--')
         
         plt.title("Train/Test accuracy")
         plt.xlabel("Step (Epoch)")
         plt.ylabel("Accuracy")
         plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
 
-    # # Add legends after all plotting is done
-    # plt.subplot(3, 2, 5)
-    # plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
-    
-    # plt.subplot(3, 2, 6)
-    # plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
     plt.tight_layout()
-    # plt.legend(loc='best', ncols=ncols, fontsize=fontsize)
     plt.show()
 
 
