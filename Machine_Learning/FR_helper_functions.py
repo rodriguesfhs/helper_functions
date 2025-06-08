@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # Import essential libraries
@@ -26,7 +26,7 @@ from torch.utils.tensorboard import SummaryWriter  # Import TensorBoard
 from tqdm.auto import tqdm
 
 
-# In[3]:
+# In[ ]:
 
 
 # Trainer function for PyTorch
@@ -202,7 +202,8 @@ def train(model: torch.nn.Module,
 
     # --- Final Confusion Matrix ---
     label_map = {0: 'P', 1: 'H', 2: 'N'}
-    class_names = [label_map[i] for i in sorted(set(all_test_labels))]
+    # class_names = [label_map[i] for i in sorted(set(all_test_labels))]
+    class_names = [label_map[i] for i in range(3)]  # Always keep full label set
 
     # class_names = sorted(list(set(all_test_labels)))
     cm = confusion_matrix(all_test_labels, all_test_preds)
@@ -236,7 +237,7 @@ def train(model: torch.nn.Module,
 
 
 
-# In[20]:
+# In[ ]:
 
 
 def generic_plotter(data_list, labels, colors, title="Plot"):
@@ -261,7 +262,7 @@ def generic_plotter(data_list, labels, colors, title="Plot"):
     plt.show()
 
 
-# In[23]:
+# In[ ]:
 
 
 def flexible_plotter(data_list, labels, colors, title="Plot",
@@ -301,7 +302,7 @@ def flexible_plotter(data_list, labels, colors, title="Plot",
     plt.show()
 
 
-# In[26]:
+# In[ ]:
 
 
 def extract_scalars(event_file, tags=None):
@@ -358,7 +359,7 @@ def process_all_runs(base_path):
     return all_metrics
 
 
-# In[29]:
+# In[ ]:
 
 
 def load_metrics(model_num):
@@ -926,7 +927,7 @@ def multi_plotter2(data_dict: dict,
 #     plt.show()
 
 
-# In[35]:
+# In[ ]:
 
 
 # def multi_plotter3(data_dict: dict,
