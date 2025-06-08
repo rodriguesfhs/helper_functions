@@ -209,7 +209,8 @@ def train(model: torch.nn.Module,
                  1:'H',
                  2:'N'}
 
-    cm = confusion_matrix(y_true=all_test_labels, y_pred=all_test_preds)
+    # Create confusion matrix using mlxtend
+    cm = confusion_matrix(y_target=all_test_labels, y_predicted=all_test_preds)
     
     fig_cm, ax = plot_confusion_matrix(
         conf_mat=cm,
