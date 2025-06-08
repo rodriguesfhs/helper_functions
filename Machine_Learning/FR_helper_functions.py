@@ -201,13 +201,21 @@ def train(model: torch.nn.Module,
     plt.show()
 
 
+
+    print("Labels:", all_test_labels[:10])
+    print("Preds:", all_test_preds[:10])
+    print("Label map:", class_names)
+    print("Confusion Matrix:\n", cm)
+
     # --- Final Confusion Matrix ---
     label_map = {0: 'P', 1: 'H', 2: 'N'}
     class_names = [label_map[i] for i in sorted(set(all_test_labels))]
 
     # class_names = sorted(list(set(all_test_labels)))
     cm = confusion_matrix(all_test_labels, all_test_preds)
-    
+
+    print("About to plot confusion matrix...")
+
     fig_cm, ax = plot_confusion_matrix(conf_mat=cm,
                                    class_names=class_names,
                                    show_normed=True,
