@@ -202,7 +202,10 @@ def train(model: torch.nn.Module,
 
 
     # --- Final Confusion Matrix ---
-    class_names = sorted(list(set(all_test_labels)))
+    label_map = {0: 'P', 1: 'H', 2: 'N'}
+    class_names = [label_map[i] for i in sorted(set(all_test_labels))]
+
+    # class_names = sorted(list(set(all_test_labels)))
     cm = confusion_matrix(all_test_labels, all_test_preds)
     
     fig_cm, ax = plot_confusion_matrix(conf_mat=cm,
