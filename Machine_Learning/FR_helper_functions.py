@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # Import essential libraries
@@ -26,7 +26,7 @@ from torch.utils.tensorboard import SummaryWriter  # Import TensorBoard
 from tqdm.auto import tqdm
 
 
-# In[ ]:
+# In[3]:
 
 
 # Trainer function for PyTorch
@@ -200,21 +200,12 @@ def train(model: torch.nn.Module,
     plt.tight_layout()
     plt.show()
 
+
     # --- Final Confusion Matrix ---
-    label_map = {0: 'P', 1: 'H', 2: 'N'}
-    # class_names = [label_map[i] for i in sorted(set(all_test_labels))]
-    class_names = [label_map[i] for i in range(3)]  # Always keep full label set
-
     # class_names = sorted(list(set(all_test_labels)))
-    # cm = confusion_matrix(all_test_labels, all_test_preds)
-    cm = confusion_matrix(all_test_labels, all_test_preds, labels=[0, 1, 2])
-
-    print("About to plot confusion matrix...")
-    print("Labels:", all_test_labels[:10])
-    print("Preds:", all_test_preds[:10])
-    print("Label map:", class_names)
-    print("Confusion Matrix:\n", cm)
-
+    class_names = ['P', 'H', 'N']
+    cm = confusion_matrix(all_test_labels, all_test_preds)
+    
     fig_cm, ax = plot_confusion_matrix(conf_mat=cm,
                                    class_names=class_names,
                                    show_normed=True,
@@ -228,8 +219,13 @@ def train(model: torch.nn.Module,
     writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
     # print("Saving local copy of confusion matrix...")
     # fig_cm.savefig("debug_conf_matrix.png")
-    plt.show()
+
     plt.close(fig_cm)
+
+
+    
+    plt.show()
+
 
     writer.close()
     print(f"TensorBoard logs saved to: runs/{MODEL_NAME}")
@@ -238,7 +234,7 @@ def train(model: torch.nn.Module,
 
 
 
-# In[ ]:
+# In[20]:
 
 
 def generic_plotter(data_list, labels, colors, title="Plot"):
@@ -263,7 +259,7 @@ def generic_plotter(data_list, labels, colors, title="Plot"):
     plt.show()
 
 
-# In[ ]:
+# In[23]:
 
 
 def flexible_plotter(data_list, labels, colors, title="Plot",
@@ -303,7 +299,7 @@ def flexible_plotter(data_list, labels, colors, title="Plot",
     plt.show()
 
 
-# In[ ]:
+# In[26]:
 
 
 def extract_scalars(event_file, tags=None):
@@ -360,7 +356,7 @@ def process_all_runs(base_path):
     return all_metrics
 
 
-# In[ ]:
+# In[29]:
 
 
 def load_metrics(model_num):
@@ -928,7 +924,7 @@ def multi_plotter2(data_dict: dict,
 #     plt.show()
 
 
-# In[ ]:
+# In[35]:
 
 
 # def multi_plotter3(data_dict: dict,
