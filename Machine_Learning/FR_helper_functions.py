@@ -226,12 +226,12 @@ def train(model: torch.nn.Module,
     writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
     # print("Saving local copy of confusion matrix...")
     # fig_cm.savefig("debug_conf_matrix.png")
-    plt.show()
+    # plt.show()
     plt.close(fig_cm)
 
 
     
-    # plt.show()
+    plt.show()
 
 
     writer.close()
