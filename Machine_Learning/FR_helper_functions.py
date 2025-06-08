@@ -26,7 +26,7 @@ from torch.utils.tensorboard import SummaryWriter  # Import TensorBoard
 from tqdm.auto import tqdm
 
 
-# In[3]:
+# In[27]:
 
 
 # Trainer function for PyTorch
@@ -209,31 +209,29 @@ def train(model: torch.nn.Module,
                  1:'H',
                  2:'N'}
 
-    cm = confusion_matrix(y_target=all_test_labels,
-                      y_predicted=all_test_preds)
+    cm = confusion_matrix(y_true=all_test_labels, y_pred=all_test_preds)
     
-    fig_cm, ax = plot_confusion_matrix(conf_mat=cm,
-                                   # class_names=class_names,
-                                   class_names=class_dict.values(),
-                                   show_normed=True,
-                                   colorbar=True,
-                                   cmap='Blues',
-                                   figsize=(4, 4))  # Pass figsize here
+    fig_cm, ax = plot_confusion_matrix(
+        conf_mat=cm,
+        class_names=list(class_dict.values()),  # Convert dict values to list
+        show_normed=True,
+        colorbar=True,
+        cmap='Blues',
+        figsize=(4, 4)  
+    )
 
     plt.title(f"{model_name} - Confusion Matrix")
     plt.tight_layout()
+    
+    # Show the confusion matrix
+    plt.show()
     
     writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
     # print("Saving local copy of confusion matrix...")
     # fig_cm.savefig("debug_conf_matrix.png")
     # plt.show()
-    plt.close(fig_cm)
-
-
-    
-    plt.show()
-
-
+    # plt.close(fig_cm)
+    # plt.show()
     writer.close()
     print(f"TensorBoard logs saved to: runs/{MODEL_NAME}")
     print("To view TensorBoard, run the following command in your terminal:")
