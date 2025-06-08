@@ -206,7 +206,8 @@ def train(model: torch.nn.Module,
     class_names = [label_map[i] for i in range(3)]  # Always keep full label set
 
     # class_names = sorted(list(set(all_test_labels)))
-    cm = confusion_matrix(all_test_labels, all_test_preds)
+    # cm = confusion_matrix(all_test_labels, all_test_preds)
+    cm = confusion_matrix(all_test_labels, all_test_preds, labels=[0, 1, 2])
 
     print("About to plot confusion matrix...")
     print("Labels:", all_test_labels[:10])
