@@ -202,12 +202,19 @@ def train(model: torch.nn.Module,
 
 
     # --- Final Confusion Matrix ---
-    class_names = sorted(list(set(all_test_labels)))
-    # class_names = ['P', 'H', 'N']
-    cm = confusion_matrix(all_test_labels, all_test_preds)
+    # class_names = sorted(list(set(all_test_labels)))      # Original
+    # cm = confusion_matrix(all_test_labels, all_test_preds) # Originsl
+    # class_names = ['P', 'H', 'N']  # Label meaning: 0 → H, 1 → N, 2 → P
+    class_dict ={0:'P',
+                 1:'H',
+                 2:'N'}
+
+    cm = confusion_matrix(y_target=all_test_labels,
+                      y_predicted=all_test_preds)
     
     fig_cm, ax = plot_confusion_matrix(conf_mat=cm,
-                                   class_names=class_names,
+                                   # class_names=class_names,
+                                   class_names=class_dict.values(),
                                    show_normed=True,
                                    colorbar=True,
                                    cmap='Blues',
@@ -219,12 +226,12 @@ def train(model: torch.nn.Module,
     writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
     # print("Saving local copy of confusion matrix...")
     # fig_cm.savefig("debug_conf_matrix.png")
-
+    plt.show()
     plt.close(fig_cm)
 
 
     
-    plt.show()
+    # plt.show()
 
 
     writer.close()
