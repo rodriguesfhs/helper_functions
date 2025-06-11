@@ -110,7 +110,7 @@ def train(model: torch.nn.Module,
             loss.backward()
             optimizer.step()
 
-            train_loss += loss.item() * x_batch.size(0)
+            train_loss += loss.item() * y_batch.size(0)
             train_correct += (preds.argmax(dim=1) == y_batch).sum().item()
 
         avg_train_loss = train_loss / len(train_loader.dataset)
@@ -134,7 +134,7 @@ def train(model: torch.nn.Module,
 
                 loss = loss_fn(preds, y_batch)
 
-                test_loss += loss.item() * x_batch.size(0)
+                test_loss += loss.item() * y_batch.size(0)
                 test_correct += (preds.argmax(dim=1) == y_batch).sum().item()
 
                 pred_labels = preds.argmax(dim=1)
