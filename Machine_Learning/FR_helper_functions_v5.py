@@ -133,8 +133,8 @@ def train(model: torch.nn.Module,
         metric_f1.reset()
 
         with torch.inference_mode():
-            for x_int, x_diff,x_diff2, x_fft,x_dwt y_batch in test_loader:
-                x_int, x_diff,x_diff2, x_fft,x_dwt y_batch = (x_int.to(device), 
+            for x_int, x_diff,x_diff2, x_fft,x_dwt, y_batch in test_loader:
+                x_int, x_diff,x_diff2, x_fft,x_dwt, y_batch = (x_int.to(device), 
                                                               x_diff.to(device),
                                                               x_diff2.to(device),
                                                               x_fft.to(device), 
