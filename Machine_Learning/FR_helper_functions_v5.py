@@ -100,8 +100,8 @@ def train(model: torch.nn.Module,
         train_loss = 0
         train_correct = 0
 
-        for x_int, x_diff, x_diff2, x_fft, x_dwt y_batch in train_loader:
-            x_int, x_diff, x_diff2, x_fft, x_dwt y_batch = (x_int.to(device), 
+        for x_int, x_diff, x_diff2, x_fft, x_dwt, y_batch in train_loader:
+            x_int, x_diff, x_diff2, x_fft, x_dwt, y_batch = (x_int.to(device), 
                                                             x_diff.to(device),
                                                             x_diff2.to(device), 
                                                             x_fft.to(device),
