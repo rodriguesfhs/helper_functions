@@ -298,6 +298,8 @@ def compute_saliency_map(model, x_input, branch_name="int", device="cpu"):
     score.backward()
 
     saliency = x_input.grad.data.abs().squeeze().cpu().numpy()
+    saliency = (saliency - saliency.min()) / (saliency.max() - saliency.min() + 1e-8)
+
     signal = x_input.detach().squeeze().cpu().numpy()
 
     plt.figure(figsize=(10, 4))
