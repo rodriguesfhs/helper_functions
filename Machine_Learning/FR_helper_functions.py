@@ -83,7 +83,7 @@ def train(model: torch.nn.Module,
     # TensorBoard logging
     writer = SummaryWriter(log_dir=f'runs/{MODEL_NAME}')
     sample_batch = next(iter(train_loader))
-    x_int_sample, x_diff_sample, x_diff2_sample, x_fft_sample, x_dwt_sample,x_psd_sample _ = sample_batch
+    x_int_sample, x_diff_sample, x_diff2_sample, x_fft_sample, x_dwt_sample,x_psd_sample, _ = sample_batch
     writer.add_graph(model, [x_int_sample.to(device),
                              x_diff_sample.to(device),
                              x_diff2_sample.to(device),
