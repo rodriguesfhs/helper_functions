@@ -52,7 +52,9 @@ def train(model: torch.nn.Module,
                                 weight_decay=weight_decay)
 
     # 🔁 ADDED: CosineAnnealingLR scheduler
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 
+                                                           T_max=epochs+100, 
+                                                           eta_min=1e-5)
 
     loss_fn = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
 
