@@ -83,13 +83,13 @@ def train(model: torch.nn.Module,
     # TensorBoard logging
     writer = SummaryWriter(log_dir=f'runs/{MODEL_NAME}')
     sample_batch = next(iter(train_loader))
-    x_int_sample, x_diff_sample, x_diff2_sample, x_fft_sample, x_dwt_sample,x_psd_sample, _ = sample_batch
+    x_int_sample, x_diff_sample, x_diff2_sample, x_fft_sample, x_dwt_sample,x_peak_sample, _ = sample_batch
     writer.add_graph(model, [x_int_sample.to(device),
                              x_diff_sample.to(device),
                              x_diff2_sample.to(device),
                              x_fft_sample.to(device),
                              x_dwt_sample.to(device),
-                             x_psd_sample.to(device)])
+                             x_peak_sample.to(device)])
 
     torch.manual_seed(42)
 
@@ -102,15 +102,15 @@ def train(model: torch.nn.Module,
         train_loss = 0
         train_correct = 0
 
-        for x_int, x_diff, x_diff2, x_fft, x_dwt, x_psd, y_batch in train_loader:
-            x_int, x_diff, x_diff2, x_fft, x_dwt, x_psd, y_batch = (x_int.to(device), 
+        for x_int, x_diff, x_diff2, x_fft, x_dwt, x_peak, y_batch in train_loader:
+            x_int, x_diff, x_diff2, x_fft, x_dwt, x_peak, y_batch = (x_int.to(device), 
                                                             x_diff.to(device),
                                                             x_diff2.to(device), 
                                                             x_fft.to(device),
                                                             x_dwt.to(device),
-                                                            x_psd.to(device),
+                                                            x_peak.to(device),
                                                             y_batch.to(device))
-            preds = model(x_int, x_diff, x_diff2, x_fft, x_dwt, x_psd)
+            preds = model(x_int, x_diff, x_diff2, x_fft, x_dwt, x_peak)
 
             loss = loss_fn(preds, y_batch)
 
@@ -136,16 +136,16 @@ def train(model: torch.nn.Module,
         metric_f1.reset()
 
         with torch.inference_mode():
-            for x_int, x_diff,x_diff2, x_fft, x_dwt, x_psd, y_batch in test_loader:
-                x_int, x_diff,x_diff2, x_fft, x_dwt, x_psd, y_batch = (x_int.to(device), 
+            for x_int, x_diff,x_diff2, x_fft, x_dwt, x_peak, y_batch in test_loader:
+                x_int, x_diff,x_diff2, x_fft, x_dwt, x_peak, y_batch = (x_int.to(device), 
                                                               x_diff.to(device),
                                                               x_diff2.to(device),
                                                               x_fft.to(device), 
                                                               x_dwt.to(device), 
-                                                              x_psd.to(device), 
+                                                              x_peak.to(device), 
                                                               y_batch.to(device))
                 
-                preds = model(x_int, x_diff,x_diff2,x_fft, x_dwt, x_psd)
+                preds = model(x_int, x_diff,x_diff2,x_fft, x_dwt, x_peak)
                 loss = loss_fn(preds, y_batch)
 
                 test_loss += loss.item() * y_batch.size(0)
