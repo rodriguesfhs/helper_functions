@@ -32,8 +32,7 @@ from tqdm.auto import tqdm
 # In[ ]:
 
 
-# Trainer function for PyTorch
-
+# Trainer Function for PyTorch
 def train(model: torch.nn.Module,
            model_name: str,
            train_loader,
@@ -46,41 +45,25 @@ def train(model: torch.nn.Module,
            epoch_tick: int =10,
            device='cpu'):
 
-    """ This function is a template for training a PyTorch model.
-    It takes a PyTorch model, a dataset, and an optimizer as input.
-        Args:
-        model (torch.nn.Module): The PyTorch model to train.
-        model_name (str): The name of the model.
-        train_loader (torch.utils.data.DataLoader): The training data loader.
-        test_loader (torch.utils.data.DataLoader): The test data loader.
-        optimizer_class (type[optim.Optimizer]): The optimizer class to use.
-        epochs (int): The number of epochs to train for.
-        lr (float): The learning rate to use.
-        weight_decay (float): The weight decay to use.
-        epoch_tick (int): The number of epochs to wait before printing metrics.
-        device (str): The device to train on.
-    """
-    
-
     model = model.to(device)
     MODEL_NAME = model_name
     optimizer = optimizer_class(params=model.parameters(),
                                 lr=lr,
                                 weight_decay=weight_decay)
+
+    # 🔁 ADDED: CosineAnnealingLR scheduler
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+
     loss_fn = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
 
-    # Metrics
     train_losses, test_losses = [], []
     train_accuracies, test_accuracies = [], []
 
-    # Initialize torchmetrics for evaluation
     metric_accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=3).to(device)
     metric_f1 = torchmetrics.F1Score(task='multiclass', num_classes=3, average='macro').to(device)
     metric_precision = torchmetrics.Precision(task='multiclass', num_classes=3, average='macro').to(device)
     metric_recall = torchmetrics.Recall(task='multiclass', num_classes=3, average='macro').to(device)
 
-
-    # TensorBoard logging
     writer = SummaryWriter(log_dir=f'runs/{MODEL_NAME}')
     sample_batch = next(iter(train_loader))
     x_int_sample, x_diff_sample, x_diff2_sample, x_fft_sample, x_dwt_sample,x_peak_sample, _ = sample_batch
@@ -97,7 +80,6 @@ def train(model: torch.nn.Module,
 
         all_test_preds, all_test_labels = [], []
 
-        # --- Training ---
         model.train()
         train_loss = 0
         train_correct = 0
@@ -111,7 +93,6 @@ def train(model: torch.nn.Module,
                                                             x_peak.to(device),
                                                             y_batch.to(device))
             preds = model(x_int, x_diff, x_diff2, x_fft, x_dwt, x_peak)
-
             loss = loss_fn(preds, y_batch)
 
             optimizer.zero_grad()
@@ -124,12 +105,10 @@ def train(model: torch.nn.Module,
         avg_train_loss = train_loss / len(train_loader.dataset)
         train_acc = train_correct / len(train_loader.dataset)
 
-        # --- Evaluation ---
         model.eval()
         test_loss = 0
         test_correct = 0
 
-        # Reset metrics
         metric_accuracy.reset()
         metric_precision.reset()
         metric_recall.reset()
@@ -155,36 +134,38 @@ def train(model: torch.nn.Module,
                 all_test_preds.extend(pred_labels.cpu().numpy())
                 all_test_labels.extend(y_batch.cpu().numpy())
 
-                # Update metrics
                 metric_accuracy.update(pred_labels, y_batch)
                 metric_precision.update(pred_labels, y_batch)
                 metric_recall.update(pred_labels, y_batch)
                 metric_f1.update(pred_labels, y_batch)
 
-
         avg_test_loss = test_loss / len(test_loader.dataset)
         test_acc = test_correct / len(test_loader.dataset)
 
-        # Compute final metric values
         acc_score = metric_accuracy.compute().item()
         prec_score = metric_precision.compute().item()
         recall_score = metric_recall.compute().item()
         f1_score = metric_f1.compute().item()
 
-        # Store metrics
         train_losses.append(avg_train_loss)
         test_losses.append(avg_test_loss)
         train_accuracies.append(train_acc)
         test_accuracies.append(test_acc)
+
+        # 🔁 ADDED: Log current learning rate
+        current_lr = optimizer.param_groups[0]['lr']
+        writer.add_scalar('LR', current_lr, epoch)
 
         if epoch % epoch_tick == 0 or epoch == 1 or epoch == epochs:
             print(f"Epoch {epoch:03d} | "
                   f"Train Loss: {avg_train_loss:.4f} | Train Acc: {train_acc:.4f} | "
                   f"Test Loss: {avg_test_loss:.4f} | Test Acc: {test_acc:.4f} | "
                   f"Prec: {prec_score:.4f} | Recall: {recall_score:.4f} | ")
-            print(f"F1: {f1_score:.4f} |")
+            print(f"F1: {f1_score:.4f} | LR: {current_lr:.6f}")
 
-        # Write to TensorBoard
+        # 🔁 ADDED: Scheduler step
+        scheduler.step()
+
         writer.add_scalar('Loss/train', avg_train_loss, epoch)
         writer.add_scalar('Accuracy/train', train_acc, epoch)
         writer.add_scalar('Loss/test', avg_test_loss, epoch)
@@ -192,7 +173,6 @@ def train(model: torch.nn.Module,
         writer.add_scalar('Precision/test', prec_score, epoch)
         writer.add_scalar('Recall/test', recall_score, epoch)
         writer.add_scalar('F1Score/test', f1_score, epoch)
-
 
     # --- Plotting ---
     epochs_range = range(1, epochs + 1)
@@ -220,44 +200,28 @@ def train(model: torch.nn.Module,
     plt.tight_layout()
     plt.show()
 
-
-    # --- Final Confusion Matrix ---
-    # class_names = sorted(list(set(all_test_labels)))      # Original
-    # cm = confusion_matrix(all_test_labels, all_test_preds) # Originsl
-    # class_names = ['P', 'H', 'N']  # Label meaning: 0 → H, 1 → N, 2 → P
-    class_dict ={0:'P',
-                 1:'H',
-                 2:'N'}
-
-    # Create confusion matrix using mlxtend
+    # --- Confusion Matrix ---
+    class_dict ={0:'P', 1:'H', 2:'N'}
     cm = confusion_matrix(y_target=all_test_labels, y_predicted=all_test_preds)
     
     fig_cm, ax = plot_confusion_matrix(
         conf_mat=cm,
-        class_names=list(class_dict.values()),  # Convert dict values to list
+        class_names=list(class_dict.values()),
         show_normed=True,
         colorbar=True,
         cmap='Blues',
-        figsize=(4, 4)  
+        figsize=(4, 4)
     )
 
     plt.title(f"{model_name} - Confusion Matrix")
     plt.tight_layout()
-    
-    # Show the confusion matrix
     plt.show()
-    
+
     writer.add_figure("ConfusionMatrix/test", fig_cm, global_step=epochs)
-    # print("Saving local copy of confusion matrix...")
-    # fig_cm.savefig("debug_conf_matrix.png")
-    # plt.show()
-    # plt.close(fig_cm)
-    # plt.show()
     writer.close()
     print(f"TensorBoard logs saved to: runs/{MODEL_NAME}")
     print("To view TensorBoard, run the following command in your terminal:")
     print("tensorboard --logdir=runs")
-
 
 
 # In[ ]:
